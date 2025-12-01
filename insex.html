@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TG TET Science (6-8) Practice Exam</title>
+    <style>
+        /* --- STYLES --- */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #e0f2f1; display: flex; flex-direction: column; height: 100vh; user-select: none; }
+        
+        /* Header - Science Theme (Teal/Green) */
+        header { background-color: #004d40; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-shrink: 0; position: sticky; top: 0; z-index: 1000; }
+        .timer { background: #fff; color: #d32f2f; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 1.1rem; }
+
+        /* Layout */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Question Area */
+        .question-area { flex: 3; padding: 20px; overflow-y: auto; background: white; display: flex; flex-direction: column; }
+        .question-header { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        .q-text-box { margin-bottom: 20px; }
+        .q-eng { font-size: 1.15rem; font-weight: bold; color: #00695c; margin-bottom: 8px; }
+        .q-tel { font-size: 1.1rem; color: #004d40; line-height: 1.5; }
+
+        /* Options */
+        .options-container { display: flex; flex-direction: column; gap: 12px; }
+        .option-label { display: flex; align-items: flex-start; padding: 12px; border: 1px solid #b2dfdb; border-radius: 8px; cursor: pointer; background: #f1f8e9; transition: 0.2s; }
+        .option-label:hover { background-color: #b2dfdb; border-color: #00897b; }
+        input[type="radio"] { margin-right: 15px; margin-top: 5px; transform: scale(1.3); flex-shrink: 0; }
+        
+        /* Review Colors */
+        .correct-answer { background-color: #c8e6c9 !important; border-color: #2e7d32 !important; } 
+        .wrong-answer { background-color: #ffcdd2 !important; border-color: #c62828 !important; } 
+
+        /* Buttons */
+        .buttons-container { margin-top: auto; padding-top: 30px; display: flex; justify-content: space-between; gap: 10px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; color: white; font-weight: bold; flex: 1; }
+        .btn-save { background-color: #00897b; } 
+        .btn-clear { background-color: #607d8b; } 
+        .btn-submit { background-color: #d32f2f; width: 100%; margin-top: 15px; padding: 15px; font-size: 1.1rem;}
+
+        /* Sidebar */
+        .sidebar { flex: 1; background: #e0f7fa; display: flex; flex-direction: column; border-left: 1px solid #80cbc4; max-width: 350px; }
+        .candidate-info { padding: 15px; background: #b2dfdb; border-bottom: 1px solid #80cbc4; text-align: center; flex-shrink: 0; color: #004d40; }
+        .palette-area { padding: 15px; flex: 1; overflow-y: auto; }
+        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .q-num { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid #80cbc4; font-weight: bold; background: #fff; border-radius: 4px; color: #004d40; }
+        
+        /* Palette Status */
+        .answered { background-color: #00897b; color: white; border-color: #00897b; }
+        .not-answered { background-color: #d32f2f; color: white; border-color: #d32f2f; }
+        .current-q { border: 2px solid #004d40; transform: scale(1.1); box-shadow: 0 0 5px rgba(0,0,0,0.3); }
+
+        /* Footer */
+        .main-footer { background-color: #004d40; color: white; text-align: center; padding: 15px; font-size: 0.9rem; flex-shrink: 0; border-top: 4px solid #00acc1; line-height: 1.6; }
+        .footer-email { color: #80cbc4; font-size: 0.85rem; text-decoration: none; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; text-align: center; width: 85%; max-width: 400px; }
+
+        /* Mobile */
+        @media screen and (max-width: 768px) {
+            body { height: auto; overflow-y: auto; display: block; }
+            .main-container { display: block; height: auto; overflow: visible; }
+            .question-area { height: auto; border-right: none; border-bottom: 5px solid #80cbc4; padding-bottom: 30px; }
+            .sidebar { height: auto; max-width: 100%; border-left: none; }
+            .buttons-container { position: relative; margin-top: 30px; }
+            .palette-area { max-height: 300px; overflow-y: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-size: 0.95rem;">TG TET Science (6-8)</div>
+    <div class="timer" id="timer">15:00</div>
+</header>
+
+<div class="main-container">
+    <div class="question-area">
+        <div class="question-header">
+            <span style="font-weight:bold; color:#555;">Question No: <span id="q-number">1</span></span>
+            <span id="review-status" style="color:#e67e22; font-weight:bold; display:none;">REVIEW MODE</span>
+        </div>
+        
+        <div class="q-text-box">
+            <div class="q-eng" id="q-text-en">Loading Question...</div>
+            <div class="q-tel" id="q-text-te">Please wait...</div>
+        </div>
+
+        <div class="options-container" id="options-box"></div>
+
+        <div class="buttons-container">
+            <button class="btn btn-clear" id="btn-clear" onclick="clearResponse()">Clear Response</button>
+            <button class="btn btn-save" id="btn-next" onclick="saveAndNext()">Save & Next</button>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="candidate-info">
+            <strong>Candidate Name</strong><br>
+            <small>Science Aspirant</small>
+        </div>
+        
+        <div class="palette-area">
+            <div style="margin-bottom:10px; font-weight:bold; color:#555;">Question Palette:</div>
+            <div class="palette-grid" id="palette-box"></div>
+            
+            <div style="margin-top:20px; font-size:0.8rem; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+                <span style="color:#00897b;">■ Answered</span>
+                <span style="color:#d32f2f;">■ Not Answered</span>
+                <span style="color:#607d8b;">□ Not Visited</span>
+            </div>
+        </div>
+
+        <div style="padding: 15px; border-top: 1px solid #ccc; background: white;">
+            <button class="btn btn-submit" id="btn-submit" onclick="submitExam()">SUBMIT EXAM</button>
+            <button class="btn btn-save" id="btn-restart" style="width:100%; display:none;" onclick="location.reload()">START NEW EXAM</button>
+        </div>
+    </div>
+</div>
+
+<footer class="main-footer">
+    Designed & Developed by:<br> 
+    <strong style="font-size:1.1em; color:#b2dfdb;">A. MUNINDER RAJU</strong><br>
+    Gazetted Headmaster, ZPHS CHINCHOLI (B)<br>
+    <span class="footer-email">📧 muninderadluri@gmail.com</span>
+</footer>
+
+<div id="resultModal" class="modal">
+    <div class="modal-content">
+        <h2 style="color:#004d40;">Exam Completed!</h2>
+        <div style="font-size:3rem; color:#00897b; font-weight:bold;" id="score">0</div>
+        <p style="color:#004d40; font-size:1.1rem;" id="percentage"></p>
+        <hr style="margin: 20px 0; border-top:1px solid #eee;">
+        <button class="btn btn-clear" style="background:#004d40; color:white; width:100%; margin-bottom:10px;" onclick="startReview()">Review Answers</button>
+        <button class="btn btn-save" style="width:100%;" onclick="location.reload()">Retake Exam</button>
+    </div>
+</div>
+
+<script>
+    // --- 40 SCIENCE QUESTIONS DATA ---
+    const questions = [
+        // Biology (Food, Living Organisms, Plants, Body)
+        { q_en: "1. Which nutrient is known as 'Body Building Food'?", q_te: "1. 'శరీర నిర్మాణ ఆహారం' (Body Building Food) అని దేనిని పిలుస్తారు?", options_en: ["Carbohydrates", "Proteins", "Fats", "Vitamins"], options_te: ["పిండిపదార్థాలు", "మాంసకృత్తులు (ప్రోటీన్లు)", "కొవ్వులు", "విటమిన్లు"], ans: 1 },
+        { q_en: "2. The deficiency of Vitamin 'C' causes:", q_te: "2. విటమిన్ 'సి' లోపం వల్ల వచ్చే వ్యాధి:", options_en: ["Night Blindness", "Beriberi", "Scurvy", "Rickets"], options_te: ["రేచీకటి", "బెరిబెరి", "స్కర్వీ", "రికెట్స్"], ans: 2 },
+        { q_en: "3. Which part of the plant is called 'Food Factory'?", q_te: "3. మొక్కలో ఏ భాగాన్ని 'ఆహార కర్మాగారం' అని పిలుస్తారు?", options_en: ["Root", "Stem", "Leaf", "Flower"], options_te: ["వేరు", "కాండం", "ఆకు", "పువ్వు"], ans: 2 },
+        { q_en: "4. The process of removing seeds from cotton is called:", q_te: "4. పత్తి నుండి విత్తనాలను వేరుచేసే పద్ధతిని ఏమంటారు?", options_en: ["Spinning", "Ginning", "Weaving", "Knitting"], options_te: ["వడకడం", "జిన్నింగ్", "నేయడం", "అల్లడం"], ans: 1 },
+        { q_en: "5. Which joint allows movement in all directions?", q_te: "5. ఏ కీలు అన్ని వైపులా కదలడానికి సహకరిస్తుంది?", options_en: ["Hinge Joint", "Ball and Socket Joint", "Pivot Joint", "Fixed Joint"], options_te: ["మడతబందు కీలు", "బంతి గిన్నె కీలు", "బొంగరపు కీలు", "కదలని కీలు"], ans: 1 },
+        { q_en: "6. The gas absorbed by plants during photosynthesis:", q_te: "6. కిరణజన్య సంయోగక్రియలో మొక్కలు గ్రహించే వాయువు:", options_en: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], options_te: ["ఆక్సిజన్", "నైట్రోజన్", "కార్బన్ డై ఆక్సైడ్", "హైడ్రోజన్"], ans: 2 },
+        { q_en: "7. Which of the following is an Omnivore?", q_te: "7. క్రింది వాటిలో 'ఉభయహారి' (Omnivore) ఏది?", options_en: ["Cow", "Lion", "Human", "Goat"], options_te: ["ఆవు", "సింహం", "మనిషి", "మేక"], ans: 2 },
+        { q_en: "8. The basic unit of living organisms is:", q_te: "8. జీవుల నిర్మాణాత్మక ప్రమాణం ఏది?", options_en: ["Tissue", "Organ", "Cell", "System"], options_te: ["కణజాలం", "అవయవం", "కణం", "వ్యవస్థ"], ans: 2 },
+        { q_en: "9. Universal donor blood group is:", q_te: "9. 'విశ్వదాత' (Universal Donor) అని పిలువబడే రక్త వర్గం:", options_en: ["A", "B", "AB", "O"], options_te: ["A", "B", "AB", "O"], ans: 3 },
+        { q_en: "10. Earthworm breathes through:", q_te: "10. వానపాము దేని ద్వారా శ్వాసిస్తుంది?", options_en: ["Lungs", "Gills", "Skin", "Trachea"], options_te: ["ఊపిరితిత్తులు", "మొప్పలు", "చర్మం", "వాయునాళాలు"], ans: 2 },
+        { q_en: "11. The green pigment present in leaves is:", q_te: "11. ఆకులలో ఉండే ఆకుపచ్చని వర్ణద్రవ్యం:", options_en: ["Haemoglobin", "Chlorophyll", "Melanin", "Carotene"], options_te: ["హీమోగ్లోబిన్", "క్లోరోఫిల్ (పత్రహరితం)", "మెలనిన్", "కెరోటిన్"], ans: 1 },
+        { q_en: "12. Seeds are dispersed by:", q_te: "12. విత్తనాల వ్యాప్తికి కారకాలు:", options_en: ["Wind", "Water", "Animals", "All of these"], options_te: ["గాలి", "నీరు", "జంతువులు", "పైవన్నీ"], ans: 3 },
+        { q_en: "13. Which of these is NOT a root vegetable?", q_te: "13. క్రింది వాటిలో వేరు కానిది ఏది?", options_en: ["Carrot", "Radish", "Potato", "Turnip"], options_te: ["కారెట్", "ముల్లంగి", "బంగాళాదుంప", "టర్నిప్"], ans: 2 }, // Potato is stem
+
+        // Physics (Light, Motion, Electricity, Magnetism)
+        { q_en: "14. Light travels in:", q_te: "14. కాంతి ఎలా ప్రయాణిస్తుంది?", options_en: ["Curved line", "Straight line", "Zigzag path", "Random path"], options_te: ["వక్ర మార్గం", "సరళ రేఖ మార్గం", "జిగ్-జాగ్ మార్గం", "ఏదైనా మార్గం"], ans: 1 },
+        { q_en: "15. Which material is a good conductor of electricity?", q_te: "15. విద్యుత్ వాహకం (Conductor) కాని పదార్థం ఏది?", options_en: ["Copper", "Wood", "Plastic", "Rubber"], options_te: ["రాగి", "చెక్క", "ప్లాస్టిక్", "రబ్బరు"], ans: 0 }, // Corrected Q: Which IS a conductor -> Copper.
+        { q_en: "16. A magnet has how many poles?", q_te: "16. అయస్కాంతానికి ఎన్ని ధృవాలు ఉంటాయి?", options_en: ["1", "2", "3", "4"], options_te: ["1", "2", "3", "4"], ans: 1 },
+        { q_en: "17. The standard unit of Length is:", q_te: "17. పొడవుకు ప్రామాణిక ప్రమాణం:", options_en: ["Kilogram", "Second", "Meter", "Liter"], options_te: ["కిలోగ్రామ్", "సెకను", "మీటరు", "లీటరు"], ans: 2 },
+        { q_en: "18. Motion of a pendulum is an example of:", q_te: "18. పెండ్యులం (లోలకం) యొక్క చలనం:", options_en: ["Rectilinear Motion", "Periodic Motion", "Circular Motion", "Rotational Motion"], options_te: ["సరళరేఖ చలనం", "డోలనా చలనం (Periodic)", "వృత్తాకార చలనం", "భ్రమణ చలనం"], ans: 1 },
+        { q_en: "19. Which mirror is used as a rear-view mirror in vehicles?", q_te: "19. వాహనాలలో 'రియర్ వ్యూ మిర్రర్' గా వాడే దర్పణం:", options_en: ["Concave", "Convex", "Plane", "None"], options_te: ["పుటాకార", "కుంభాకార", "సమతల", "ఏదీకాదు"], ans: 1 },
+        { q_en: "20. The filament of an electric bulb is made of:", q_te: "20. ఎలక్ట్రిక్ బల్బులోని ఫిలమెంట్ దేనితో తయారవుతుంది?", options_en: ["Iron", "Copper", "Tungsten", "Aluminum"], options_te: ["ఇనుము", "రాగి", "టంగ్ స్టన్", "అల్యూమినియం"], ans: 2 },
+        { q_en: "21. Like poles of a magnet:", q_te: "21. అయస్కాంతం యొక్క సజాతి ధృవాలు:", options_en: ["Attract each other", "Repel each other", "No effect", "Stick together"], options_te: ["ఆకర్షించుకుంటాయి", "వికర్షించుకుంటాయి", "ఏ ప్రభావం ఉండదు", "అతుక్కుంటాయి"], ans: 1 },
+        { q_en: "22. Speed = ?", q_te: "22. వేగం (Speed) సూత్రం:", options_en: ["Distance × Time", "Distance / Time", "Time / Distance", "Distance + Time"], options_te: ["దూరం × కాలం", "దూరం / కాలం", "కాలం / దూరం", "దూరం + కాలం"], ans: 1 },
+        { q_en: "23. Shadow is formed when light is blocked by:", q_te: "23. కాంతిని అడ్డుకున్నప్పుడు నీడ ఏర్పడే వస్తువు:", options_en: ["Transparent object", "Opaque object", "Translucent object", "Glass"], options_te: ["పారదర్శక వస్తువు", "అపారదర్శక వస్తువు", "పాక్షిక పారదర్శక", "గాజు"], ans: 1 },
+        { q_en: "24. Sound cannot travel through:", q_te: "24. శబ్దం దేని ద్వారా ప్రయాణించలేదు?", options_en: ["Solids", "Liquids", "Gases", "Vacuum"], options_te: ["ఘన పదార్థాలు", "ద్రవ పదార్థాలు", "వాయువులు", "శూన్యం (Vacuum)"], ans: 3 },
+        { q_en: "25. The glowing part of the bulb is called:", q_te: "25. బల్బులో వెలిగే భాగాన్ని ఏమంటారు?", options_en: ["Filament", "Terminal", "Glass case", "Base"], options_te: ["ఫిలమెంట్", "టెర్మినల్", "గాజు కవచం", "బేస్"], ans: 0 },
+
+        // Chemistry (Materials, Separation, Acids/Bases)
+        { q_en: "26. Separation of grains from stalks is called:", q_te: "26. కట్టల నుండి గింజలను వేరుచేసే పద్ధతి:", options_en: ["Threshing", "Winnowing", "Sieving", "Handpicking"], options_te: ["నూర్పిడి (Threshing)", "తూర్పారబట్టడం", "జల్లించడం", "ఏరివేయడం"], ans: 0 },
+        { q_en: "27. Salt is obtained from seawater by:", q_te: "27. సముద్రపు నీటి నుండి ఉప్పును పొందే పద్ధతి:", options_en: ["Filtration", "Evaporation", "Condensation", "Decantation"], options_te: ["వడపోత", "బాష్పీభవనం (Evaporation)", "సాంద్రీకరణం", "తేర్చడం"], ans: 1 },
+        { q_en: "28. Which of these is a chemical change?", q_te: "28. క్రింది వాటిలో రసాయన మార్పు ఏది?", options_en: ["Melting of ice", "Tearing paper", "Rusting of iron", "Boiling water"], options_te: ["మంచు కరగడం", "కాగితం చింపడం", "ఇనుము తుప్పు పట్టడం", "నీరు మరగడం"], ans: 2 },
+        { q_en: "29. The acid present in Lemon is:", q_te: "29. నిమ్మకాయలో ఉండే ఆమ్లం:", options_en: ["Lactic acid", "Citric acid", "Acetic acid", "Tartaric acid"], options_te: ["లాక్టిక్ ఆమ్లం", "సిట్రిక్ ఆమ్లం", "ఎసిటిక్ ఆమ్లం", "టార్టారిక్ ఆమ్లం"], ans: 1 },
+        { q_en: "30. Materials through which we can see clearly are:", q_te: "30. ఏ పదార్థాల గుండా మనం స్పష్టంగా చూడగలం?", options_en: ["Transparent", "Opaque", "Translucent", "None"], options_te: ["పారదర్శక (Transparent)", "అపారదర్శక", "పాక్షిక పారదర్శక", "ఏదీకాదు"], ans: 0 },
+        { q_en: "31. Water boils at:", q_te: "31. నీటి బాష్పీభవన స్థానం (Boiling Point):", options_en: ["0°C", "50°C", "100°C", "150°C"], options_te: ["0°C", "50°C", "100°C", "150°C"], ans: 2 },
+        { q_en: "32. Turmeric is a natural:", q_te: "32. పసుపు అనేది ఒక సహజ _____:", options_en: ["Acid", "Base", "Indicator", "Salt"], options_te: ["ఆమ్లం", "క్షారం", "సూచిక (Indicator)", "లవణం"], ans: 2 },
+        { q_en: "33. Which fiber is called 'Artificial Silk'?", q_te: "33. 'కృత్రిమ పట్టు' అని ఏ దారాన్ని పిలుస్తారు?", options_en: ["Nylon", "Rayon", "Polyester", "Acrylic"], options_te: ["నైలాన్", "రేయాన్", "పాలిస్టర్", "ఆక్రిలిక్"], ans: 1 },
+        { q_en: "34. Chemical formula of Water:", q_te: "34. నీటి రసాయన ఫార్ములా:", options_en: ["H2O", "CO2", "O2", "NaCl"], options_te: ["H2O", "CO2", "O2", "NaCl"], ans: 0 },
+        { q_en: "35. Conversion of water vapor into water is called:", q_te: "35. నీటి ఆవిరి నీరుగా మారే ప్రక్రియను ఏమంటారు?", options_en: ["Evaporation", "Condensation", "Freezing", "Melting"], options_te: ["బాష్పీభవనం", "సాంద్రీకరణం (Condensation)", "గడ్డకట్టడం", "కరగడం"], ans: 1 },
+        
+        // General Science / EVS
+        { q_en: "36. World Water Day is celebrated on:", q_te: "36. ప్రపంచ జల దినోత్సవం ఎప్పుడు జరుపుకుంటారు?", options_en: ["March 22", "April 22", "June 5", "May 1"], options_te: ["మార్చి 22", "ఏప్రిల్ 22", "జూన్ 5", "మే 1"], ans: 0 },
+        { q_en: "37. Which gas supports burning?", q_te: "37. మంటలు మండటానికి సహాయపడే వాయువు:", options_en: ["Nitrogen", "Oxygen", "Carbon dioxide", "Hydrogen"], options_te: ["నైట్రోజన్", "ఆక్సిజన్", "కార్బన్ డై ఆక్సైడ్", "హైడ్రోజన్"], ans: 1 },
+        { q_en: "38. The percentage of Nitrogen in atmosphere:", q_te: "38. వాతావరణంలో నైట్రోజన్ శాతం:", options_en: ["21%", "0.03%", "78%", "50%"], options_te: ["21%", "0.03%", "78%", "50%"], ans: 2 },
+        { q_en: "39. Rainwater harvesting helps to:", q_te: "39. వర్షపు నీటి సంరక్షణ (Inkudu gunta) దేనికి ఉపయోగపడుతుంది?", options_en: ["Increase groundwater", "Cause floods", "Pollute water", "None"], options_te: ["భూగర్భ జలాలు పెంచడానికి", "వరదలు రావడానికి", "నీరు కలుషితం చేయడానికి", "ఏదీకాదు"], ans: 0 },
+        { q_en: "40. Biodegradable waste includes:", q_te: "40. 'బయోడిగ్రేడబుల్' (కుళ్ళిపోయే) వ్యర్థం ఏది?", options_en: ["Plastic bottle", "Glass", "Vegetable peels", "Metal can"], options_te: ["ప్లాస్టిక్ బాటిల్", "గాజు", "కూరగాయల తొక్కలు", "లోహపు డబ్బా"], ans: 2 }
+    ];
+
+    // --- EXAM LOGIC ---
+    let currentQIndex = 0;
+    let userAnswers = new Array(questions.length).fill(null); 
+    let timeLeft = 900; 
+    let timerInterval;
+    let isReviewMode = false;
+
+    function loadQuestion(index) {
+        try {
+            currentQIndex = index;
+            document.getElementById('q-number').innerText = index + 1;
+            document.getElementById('q-text-en').innerText = questions[index].q_en;
+            document.getElementById('q-text-te').innerText = questions[index].q_te;
+            
+            const optionsBox = document.getElementById('options-box');
+            optionsBox.innerHTML = '';
+
+            questions[index].options_en.forEach((optEn, i) => {
+                let optTe = questions[index].options_te[i];
+                let isChecked = userAnswers[index] === i ? 'checked' : '';
+                
+                let rowStyle = '';
+                let statusText = '';
+                
+                if (isReviewMode) {
+                    if (i === questions[index].ans) {
+                        rowStyle = 'correct-answer';
+                        statusText = '<span style="color:green; margin-left:auto; font-weight:bold;">✔ Correct</span>';
+                    }
+                    if (userAnswers[index] === i && i !== questions[index].ans) {
+                        rowStyle = 'wrong-answer';
+                        statusText = '<span style="color:red; margin-left:auto; font-weight:bold;">✘ Wrong</span>';
+                    }
+                    isChecked += ' disabled';
+                }
+
+                optionsBox.innerHTML += `
+                    <label class="option-label ${rowStyle}">
+                        <input type="radio" name="option" value="${i}" ${isChecked}>
+                        <div style="display:flex; flex-direction:column; width:100%;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:600; font-size:1rem; color:#004d40;">${optEn}</span>
+                                ${statusText}
+                            </div>
+                            <span style="font-size:0.95rem; color:#00695c;">${optTe}</span>
+                        </div>
+                    </label>
+                `;
+            });
+            updatePalette();
+            updateButtons();
+        } catch(e) {
+            console.error(e);
+            alert("Error Loading Question. Please refresh.");
+        }
+    }
+
+    function saveAndNext() {
+        if(isReviewMode) {
+            if (currentQIndex < questions.length - 1) loadQuestion(currentQIndex + 1);
+            return;
+        }
+
+        const selected = document.querySelector('input[name="option"]:checked');
+        if (selected) userAnswers[currentQIndex] = parseInt(selected.value);
+        
+        if (currentQIndex < questions.length - 1) loadQuestion(currentQIndex + 1);
+        else alert("This is the last question. Check Palette & Submit.");
+        updatePalette();
+    }
+
+    function clearResponse() {
+        if(isReviewMode) return;
+        const selected = document.querySelector('input[name="option"]:checked');
+        if (selected) {
+            selected.checked = false;
+            userAnswers[currentQIndex] = null;
+        }
+    }
+
+    function updatePalette() {
+        const paletteBox = document.getElementById('palette-box');
+        paletteBox.innerHTML = '';
+        userAnswers.forEach((ans, i) => {
+            let statusClass = 'not-visited';
+            if (ans !== null) statusClass = 'answered';
+            else if (i === currentQIndex) statusClass = 'not-answered';
+            
+            let activeClass = (i === currentQIndex) ? 'current-q' : '';
+            paletteBox.innerHTML += `<div class="q-num ${statusClass} ${activeClass}" onclick="loadQuestion(${i})">${i + 1}</div>`;
+        });
+    }
+
+    function updateButtons() {
+        if (isReviewMode) {
+            document.getElementById('btn-clear').style.display = 'none';
+            document.getElementById('btn-next').innerText = 'Next Question >';
+        }
+    }
+
+    function startTimer() {
+        const timerElement = document.getElementById('timer');
+        timerInterval = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            timerElement.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft-- <= 0) { clearInterval(timerInterval); submitExam(); }
+        }, 1000);
+    }
+
+    function submitExam() {
+        clearInterval(timerInterval);
+        let score = 0;
+        questions.forEach((q, i) => { if (userAnswers[i] === q.ans) score++; });
+        
+        document.getElementById('score').innerText = `${score} / ${questions.length}`;
+        let percent = Math.round((score/questions.length)*100);
+        document.getElementById('percentage').innerText = `Percentage: ${percent}%`;
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+
+    function startReview() {
+        isReviewMode = true;
+        document.getElementById('resultModal').style.display = 'none';
+        document.getElementById('review-status').style.display = 'inline';
+        document.getElementById('btn-submit').style.display = 'none';
+        document.getElementById('btn-restart').style.display = 'block';
+        loadQuestion(0);
+    }
+
+    // Initialize
+    window.onload = function() {
+        loadQuestion(0);
+        startTimer();
+    };
+</script>
+
+</body>
+</html>
